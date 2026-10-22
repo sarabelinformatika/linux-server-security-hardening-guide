@@ -1,0 +1,48 @@
+name: Validate guide
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install validators
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck yamllint
+      - name: Check shell syntax
+        run: |
+          find scripts -type f -name '*.sh' -print0 | xargs -0 -r -n1 bash -n
+          find scripts -type f -name '*.sh' -print0 | xargs -0 -r shellcheck
+      - name: Check YAML
+        run: yamllint -d relaxed examples .github/workflows
+      - name: Check internal Markdown links
+        shell: pwsh
+        run: |
+          $failed = $false
+          Get-ChildItem -Recurse -Filter *.md | ForEach-Object {
+            $file = $_
+            $directory = $file.DirectoryName
+            $content = Get-Content $file.FullName -Raw
+            [regex]::Matches($content, '\[[^\]]+\]\((?!https?://|mailto:|#)([^)#]+)') | ForEach-Object {
+              $target = $_.Groups[1].Value
+              $resolved = Join-Path $directory $target
+              if (-not (Test-Path $resolved)) {
+                Write-Error "Broken link in ${file}: $target"
+                $failed = $true
+              }
+            }
+          }
+          if ($failed) { exit 1 }
+      - name: Scan common secret patterns
+        run: |
+          if grep -RInE --exclude-dir=.git --exclude='validate.yml' '(BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|api[_-]?token\s*[:=]\s*[^< ]+|password\s*[:=]\s*[^< ]+)' .; then
+            echo 'Potential secret material found.'
+            exit 1
+          fi

@@ -1,0 +1,16 @@
+schema_version: 1
+profile: general-purpose-server
+settings:
+  - key: kernel.randomize_va_space
+    expected: 2
+    rationale: full-address-space-layout-randomization
+  - key: kernel.kptr_restrict
+    expected: 2
+    rationale: restrict-kernel-pointer-exposure
+  - key: net.ipv4.conf.all.accept_redirects
+    expected: 0
+    rationale: server-does-not-accept-icmp-redirects
+review_notes:
+  asymmetric_routing_checked: true
+  containers_checked: true
+  rollback_tested: true

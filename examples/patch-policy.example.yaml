@@ -1,0 +1,16 @@
+schema_version: 1
+policy:
+  owner: platform-operations
+  emergency:
+    target_hours: 24
+    criteria: known-exploited-or-critical-exposure
+  high:
+    target_days: 7
+  routine:
+    target_days: 30
+  reboot:
+    tracked: true
+    validation_required: true
+  evidence:
+    retain_days: 400
+    fields: [asset, advisory, approval, start, finish, result, reboot, validator]

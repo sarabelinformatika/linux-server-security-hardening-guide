@@ -1,0 +1,19 @@
+schema_version: 1
+metadata:
+  name: production-linux-server
+  owner: security-operations
+  review_interval_days: 90
+scope:
+  distributions: [debian, ubuntu, rhel-compatible]
+  environments: [production]
+controls:
+  named_admin_accounts: required
+  remote_admin_mfa: required
+  direct_root_ssh: prohibited
+  host_firewall: required
+  mandatory_access_control: enforcing
+  central_security_logs: required
+  restore_test_interval_days: 90
+exceptions:
+  approval_required: true
+  maximum_days: 90

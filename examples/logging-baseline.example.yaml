@@ -1,0 +1,17 @@
+schema_version: 1
+logging:
+  timezone: UTC
+  persistent_journal: true
+  central_forwarding:
+    required: true
+    transport: tls
+    mutual_authentication: true
+  alert_on:
+    - authentication-failure-burst
+    - privilege-policy-change
+    - audit-service-failure
+    - mac-enforcement-disabled
+    - time-synchronization-loss
+  retention:
+    local_days: 14
+    central_days: 365
